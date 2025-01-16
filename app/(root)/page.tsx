@@ -1,17 +1,21 @@
-import { UserButton } from "@clerk/nextjs";
-import { auth } from "@clerk/nextjs/server";
-import { redirect } from "next/navigation";
+"use client";
 
-export default async function SetupPage() {
-  const { userId } = await auth();
+import { useStoreModal } from "@/hooks/use-store-modal";
+import { useEffect } from "react";
 
-  if (!userId) {
-    redirect("/sign-in");
-  }
+export default function SetupPage() {
+  const onOpen = useStoreModal((state) => state.onOpen);
+  const isOpen = useStoreModal((state) => state.isOpen);
+
+  useEffect(() => {
+    if (!isOpen) {
+      onOpen();
+    }
+  }, [isOpen, onOpen]);
 
   return (
     <div className="p-4">
-      <UserButton afterSignOutUrl="/" />
+      Root page
     </div>
   );
 }
