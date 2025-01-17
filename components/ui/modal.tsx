@@ -31,12 +31,12 @@ export const Modal: React.FC<ModalProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onChange}>
-      <DialogContent>
-        <DialogHeader>
+      <DialogContent className="max-w-[400px] w-[400px] h-fit p-0 overflow-hidden">
+        <DialogHeader className="p-6 pb-0">
           <DialogTitle>{title}</DialogTitle>
           <DialogDescription>{description}</DialogDescription>
         </DialogHeader>
-        <div>{children}</div>
+        <div className="px-6">{children}</div>
       </DialogContent>
     </Dialog>
   );

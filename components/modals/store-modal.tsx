@@ -37,7 +37,7 @@ export const StoreModal = () => {
       isOpen={storeModal.isOpen}
       onClose={storeModal.onClose}
     >
-      <div className="space-y-4 py-2 pb-4">
+      <div className="space-y-4 pb-4">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
             <FormField
@@ -45,7 +45,7 @@ export const StoreModal = () => {
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Store name</FormLabel>
+                  <FormLabel>Store Name</FormLabel>
                   <FormControl>
                     <Input placeholder="E-Commerce" {...field} />
                   </FormControl>
