@@ -41,9 +41,10 @@ export const StoreModal = () => {
         title: "Store created successfully",
         description: `Created at: ${response.data.createdAt}`,
       });
-      
-      form.reset();
 
+      form.reset();
+      window.location.assign(`/${response.data.id}`);
+      
     } catch (error) {
       console.log(error);
       toast({
