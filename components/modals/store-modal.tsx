@@ -12,6 +12,7 @@ import { Button } from "../ui/button";
 import { useState } from "react";
 import axios from "axios";
 import { useToast } from "@/hooks/use-toast";
+import { Store } from "@prisma/client";
 
 // create a schema for the form
 const formSchema = z.object({
@@ -35,21 +36,43 @@ export const StoreModal = () => {
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
       setIsLoading(true);
-      const response = await axios.post("/api/stores", values);
+
+      // Check if store name exists in a single request
+      const { data: stores }: { data: Store[] } = await axios.get(
+        "/api/stores"
+      );
+      const storeExists = stores.some(
+        (store: Store) => store.name.toLowerCase() === values.name.toLowerCase()
+      );
+
+      if (storeExists) {
+        toast({
+          title: "Store name already exists",
+          description: "Please choose a different name",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      const { data: newStore }: { data: Store } = await axios.post(
+        "/api/stores",
+        values
+      );
 
       toast({
         title: "Store created successfully",
-        description: `Created at: ${response.data.createdAt}`,
+        description: `Created at: ${newStore.createdAt}`,
       });
 
       form.reset();
-      window.location.assign(`/${response.data.id}`);
-      
+      // Use router.push instead of window.location for better navigation
+      window.location.assign(`/${newStore.id}`);
+      storeModal.onClose();
     } catch (error) {
-      console.log(error);
+      console.error("[STORE_CREATION_ERROR]", error);
       toast({
-        title: "Error",
-        description: "Something went wrong",
+        title: "Error creating store",
+        description: "Please try again later",
         variant: "destructive",
       });
     } finally {

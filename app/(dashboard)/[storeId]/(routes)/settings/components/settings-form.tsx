@@ -20,6 +20,7 @@ import axios from "axios";
 import { useParams, useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
 import { AlertModal } from "@/components/modals/alert-modal";
+import { ApiAlert } from "@/components/ui/api-alert";
 
 interface SettingsFormProps {
   initialData: Store;
@@ -46,18 +47,36 @@ export const SettingsForm = ({ initialData }: SettingsFormProps) => {
   const onSubmit = async (data: SettingsFormValues) => {
     try {
       setLoading(true);
+
+      // check if the store name already exists
+      const { data: stores }: { data: Store[] } = await axios.get("/api/stores");
+      const storeExists = stores.some(
+        (store: Store) => store.name === data.name
+      );
+      if (storeExists) {
+        toast({
+          title: "Store name already exists",
+          description: "Please choose a different name",
+          variant: "destructive",
+        });
+        return;
+      }
+
       await axios.patch(`/api/stores/${params.storeId}`, data);
       router.refresh();
       toast({
         title: "Store updated successfully",
         description: "Your store has been updated",
       });
+
     } catch (error) {
+
       toast({
         title: "Error",
         description: `Something went wrong: ${error}`,
         variant: "destructive",
       });
+
     } finally {
       setLoading(false);
     }
@@ -66,6 +85,21 @@ export const SettingsForm = ({ initialData }: SettingsFormProps) => {
   const onDelete = async () => {
     try {
       setLoading(true);
+      // check if the store exists and delete it
+      const { data: stores }: { data: Store[] } = await axios.get("/api/stores");
+      const storeExists = stores.some(
+        (store: Store) => store.id === params.storeId
+      );
+      
+      if (!storeExists) {
+        toast({
+          title: "Store not found",
+          description: "The store you are trying to delete does not exist",
+          variant: "destructive",
+        });
+        return;
+      }
+
       await axios.delete(`/api/stores/${params.storeId}`);
       router.refresh();
       router.push("/");
@@ -132,6 +166,12 @@ export const SettingsForm = ({ initialData }: SettingsFormProps) => {
           <Button disabled={loading} className="ml-auto" type="submit">
             Save Changes
           </Button>
+          <Separator />
+          <ApiAlert
+            title="NEXT_PUBLIC_API_URL"
+            description={`${process.env.NEXT_PUBLIC_API_URL}/api/${params.storeId}`}
+            variant="public"
+          />
         </form>
       </Form>
     </>
