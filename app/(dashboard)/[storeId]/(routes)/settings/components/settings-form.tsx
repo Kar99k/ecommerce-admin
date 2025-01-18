@@ -21,6 +21,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
 import { AlertModal } from "@/components/modals/alert-modal";
 import { ApiAlert } from "@/components/ui/api-alert";
+import { useOrigin } from "@/hooks/use-origin";
 
 interface SettingsFormProps {
   initialData: Store;
@@ -38,6 +39,7 @@ export const SettingsForm = ({ initialData }: SettingsFormProps) => {
   const params = useParams();
   const router = useRouter();
   const { toast } = useToast();
+  const origin = useOrigin();
 
   const form = useForm<SettingsFormValues>({
     resolver: zodResolver(formSchema),
@@ -49,7 +51,9 @@ export const SettingsForm = ({ initialData }: SettingsFormProps) => {
       setLoading(true);
 
       // check if the store name already exists
-      const { data: stores }: { data: Store[] } = await axios.get("/api/stores");
+      const { data: stores }: { data: Store[] } = await axios.get(
+        "/api/stores"
+      );
       const storeExists = stores.some(
         (store: Store) => store.name === data.name
       );
@@ -68,15 +72,12 @@ export const SettingsForm = ({ initialData }: SettingsFormProps) => {
         title: "Store updated successfully",
         description: "Your store has been updated",
       });
-
     } catch (error) {
-
       toast({
         title: "Error",
         description: `Something went wrong: ${error}`,
         variant: "destructive",
       });
-
     } finally {
       setLoading(false);
     }
@@ -86,11 +87,13 @@ export const SettingsForm = ({ initialData }: SettingsFormProps) => {
     try {
       setLoading(true);
       // check if the store exists and delete it
-      const { data: stores }: { data: Store[] } = await axios.get("/api/stores");
+      const { data: stores }: { data: Store[] } = await axios.get(
+        "/api/stores"
+      );
       const storeExists = stores.some(
         (store: Store) => store.id === params.storeId
       );
-      
+
       if (!storeExists) {
         toast({
           title: "Store not found",
@@ -169,7 +172,7 @@ export const SettingsForm = ({ initialData }: SettingsFormProps) => {
           <Separator />
           <ApiAlert
             title="NEXT_PUBLIC_API_URL"
-            description={`${process.env.NEXT_PUBLIC_API_URL}/api/${params.storeId}`}
+            description={`${origin}/api/${params.storeId}`}
             variant="public"
           />
         </form>
