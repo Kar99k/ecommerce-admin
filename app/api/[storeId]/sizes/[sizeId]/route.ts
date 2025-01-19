@@ -2,23 +2,23 @@ import { prismadb } from "@/lib/prismadb";
 import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 
-// PATCH /api/[storeId]/categories/[categoryId]
+// PATCH /api/[storeId]/sizes/[sizeId]
 export async function PATCH(
   req: Request,
-  { params }: { params: { storeId: string; categoryId: string } }
+  { params }: { params: { storeId: string; sizeId: string } }
 ) {
   try {
     const { userId } = await auth();
     const body = await req.json();
-    const { name, billboardId } = body;
-    const { storeId, categoryId } = await params;
+    const { name, value } = body;
+    const { storeId, sizeId } = await params;
 
     if (!userId) {
       return new NextResponse("Unauthenticated", { status: 401 });
     }
 
-    if (!name || !billboardId) {
-      return new NextResponse("Name and billboardId are required", {
+    if (!name || !value) {
+      return new NextResponse("Name and value are required", {
         status: 400,
       });
     }
@@ -27,6 +27,10 @@ export async function PATCH(
       return new NextResponse("StoreId is required", { status: 400 });
     }
 
+    if (!sizeId) {
+      return new NextResponse("SizeId is required", { status: 400 });
+    }
+
     const storeByUserId = await prismadb.store.findFirst({
       where: {
         userId,
@@ -38,31 +42,31 @@ export async function PATCH(
       return new NextResponse("Unauthorized", { status: 403 });
     }
 
-    const category = await prismadb.category.update({
+    const size = await prismadb.size.update({
       where: {
-        id: categoryId,
+        id: sizeId,
       },
       data: {
         name,
-        billboardId,
+        value,
       },
     });
 
-    return NextResponse.json(category);
+    return NextResponse.json(size);
   } catch (error) {
-    console.log("[CATEGORY_PUT]", error);
+    console.log("[SIZE_PUT]", error);
     return new NextResponse("Internal error", { status: 500 });
   }
 }
 
-// DELETE /api/[storeId]/categories/[categoryId]
+// DELETE /api/[storeId]/sizes/[sizeId]
 export async function DELETE(
   req: Request,
-  { params }: { params: { storeId: string; categoryId: string } }
+  { params }: { params: { storeId: string; sizeId: string } }
 ) {
   try {
     const { userId } = await auth();
-    const { storeId, categoryId } = await params;
+    const { storeId, sizeId } = await params;
 
     if (!userId) {
       return new NextResponse("Unauthenticated", { status: 401 });
@@ -72,6 +76,10 @@ export async function DELETE(
       return new NextResponse("StoreId is required", { status: 400 });
     }
 
+    if (!sizeId) {
+      return new NextResponse("SizeId is required", { status: 400 });
+    }
+
     const storeByUserId = await prismadb.store.findFirst({
       where: {
         userId,
@@ -83,47 +91,44 @@ export async function DELETE(
       return new NextResponse("Unauthorized", { status: 403 });
     }
 
-    const category = await prismadb.category.delete({
+    const size = await prismadb.size.delete({
       where: {
-        id: categoryId,
+        id: sizeId,
       },
     });
 
-    return NextResponse.json(category);
+    return NextResponse.json(size);
   } catch (error) {
-    console.log("[CATEGORY_DELETE]", error);
+    console.log("[SIZE_DELETE]", error);
     return new NextResponse("Internal error", { status: 500 });
   }
 }
 
-// GET /api/[storeId]/categories/[categoryId]
+// GET /api/[storeId]/sizes/[sizeId]
 export async function GET(
   req: Request,
-  { params }: { params: { storeId: string; categoryId: string } }
+  { params }: { params: { storeId: string; sizeId: string } }
 ) {
   try {
-    const { storeId, categoryId } = await params;
+    const { storeId, sizeId } = await params;
 
     if (!storeId) {
       return new NextResponse("StoreId is required", { status: 400 });
     }
 
-    if (!categoryId) {
-      return new NextResponse("CategoryId is required", { status: 400 });
+    if (!sizeId) {
+      return new NextResponse("SizeId is required", { status: 400 });
     }
 
-    const category = await prismadb.category.findUnique({
+    const size = await prismadb.size.findUnique({
       where: {
-        id: categoryId,
-      },
-      include: {
-        billboard: true,
+        id: sizeId,
       },
     });
 
-    return NextResponse.json(category);
+    return NextResponse.json(size);
   } catch (error) {
-    console.log("[CATEGORY_GET]", error);
+    console.log("[SIZE_GET]", error);
     return new NextResponse("Internal error", { status: 500 });
   }
 }
