@@ -10,7 +10,7 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
-import { BillboardColumn } from "./columns";
+import { CategoryColumn } from "./columns";
 import { useToast } from "@/hooks/use-toast";
 import { usePathname, useRouter } from "next/navigation";
 import axios from "axios";
@@ -18,7 +18,7 @@ import { useState } from "react";
 import { AlertModal } from "@/components/modals/alert-modal";
 
 interface CellActionProps {
-  data: BillboardColumn;
+  data: CategoryColumn;
 }
 
 export const CellAction = ({ data }: CellActionProps) => {
@@ -32,7 +32,7 @@ export const CellAction = ({ data }: CellActionProps) => {
   const onCopy = () => {
     navigator.clipboard.writeText(data.id);
     toast({
-      title: "Billboard ID copied to clipboard",
+      title: "Category ID copied to clipboard",
     });
   };
 
@@ -46,11 +46,11 @@ export const CellAction = ({ data }: CellActionProps) => {
       await axios.delete(`/api/${pathname}/${data.id}`);
       router.refresh();
       toast({
-        title: "Billboard deleted successfully",
+        title: "Category deleted successfully",
       });
     } catch (error) {
       toast({
-        title: "Failed to delete billboard",
+        title: "Failed to delete category",
         description: "Please try again: " + error,
         variant: "destructive",
       });
