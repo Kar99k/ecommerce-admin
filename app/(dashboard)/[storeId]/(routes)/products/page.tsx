@@ -4,7 +4,11 @@ import { ProductColumn } from "./components/columns";
 import { format } from "date-fns";
 import { formatter } from "@/lib/utils";
 
-const ProductPage = async ({ params }: { params: { storeId: string } }) => {
+const ProductPage = async ({
+  params,
+}: {
+  params: Promise<{ storeId: string }>;
+}) => {
   const { storeId } = await params;
   const products = await prismadb.product.findMany({
     where: {

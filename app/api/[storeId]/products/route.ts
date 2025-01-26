@@ -3,8 +3,11 @@ import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 
 // POST /api/[storeId]/products
-export async function POST(req: Request, props: { params: Promise<{ storeId: string }> }) {
-  const params = await props.params;
+export async function POST(
+  req: Request,
+  props: { params: Promise<{ storeId: string }> }
+) {
+  const { storeId } = await props.params;
   try {
     const { userId } = await auth();
 
@@ -45,9 +48,7 @@ export async function POST(req: Request, props: { params: Promise<{ storeId: str
     if (!userId) {
       return new NextResponse("Unauthenticated", { status: 401 });
     }
-
-    const { storeId } = params;
-
+    
     const product = await prismadb.product.create({
       data: {
         name,
@@ -76,17 +77,16 @@ export async function POST(req: Request, props: { params: Promise<{ storeId: str
 // GET /api/[storeId]/products
 export async function GET(
   req: Request,
-  { params }: { params: { storeId: string } }
+  props: { params: Promise<{ storeId: string }> }
 ) {
   try {
+    const { storeId } = await props.params;
     const { searchParams } = new URL(req.url);
 
     const categoryId = searchParams.get("categoryId") || undefined;
     const colorId = searchParams.get("colorId") || undefined;
     const sizeId = searchParams.get("sizeId") || undefined;
     const isFeatured = searchParams.get("isFeatured") || undefined;
-
-    const { storeId } = await params;
 
     if (!storeId) {
       return new NextResponse("StoreId is required", { status: 400 });

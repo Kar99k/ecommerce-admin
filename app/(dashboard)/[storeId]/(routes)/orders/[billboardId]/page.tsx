@@ -4,7 +4,7 @@ import { BillboardForm } from "./components/billboard-form";
 const BillboardPage = async ({
   params,
 }: {
-  params: { billboardId: string; storeId: string };
+  params: Promise<{ billboardId: string}>;
 }) => {
   const { billboardId } = await params;
 

@@ -1,15 +1,16 @@
 import { prismadb } from "@/lib/prismadb";
 import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
+// convert to   props: { params: Promise<{ storeId: string }> }
 
 // PATCH /api/[storeId]/billboards/[billboardId]
 export async function PATCH(
   req: Request,
-  { params }: { params: { storeId: string; billboardId: string } }
+  props: { params: Promise<{ storeId: string; billboardId: string }> }
 ) {
+  const { storeId, billboardId } = await props.params;
   try {
     const { userId } = await auth();
-    const { storeId, billboardId } = await params;
     const body = await req.json();
     const { label, imageUrl } = body;
 
@@ -43,11 +44,11 @@ export async function PATCH(
 // DELETE /api/[storeId]/billboards/[billboardId]
 export async function DELETE(
   req: Request,
-  { params }: { params: { storeId: string; billboardId: string } }
+  props: { params: Promise<{ storeId: string; billboardId: string }> }
 ) {
+  const { storeId, billboardId } = await props.params;
   try {
     const { userId } = await auth();
-    const { storeId, billboardId } = await params;
 
     if (!userId) return new NextResponse("Unauthenticated", { status: 403 });
     if (!storeId)
@@ -76,10 +77,10 @@ export async function DELETE(
 // GET /api/[storeId]/billboards/[billboardId]
 export async function GET(
   req: Request,
-  { params }: { params: { storeId: string; billboardId: string } }
+  props: { params: Promise<{ storeId: string; billboardId: string }> }
 ) {
+  const { storeId, billboardId } = await props.params;
   try {
-    const { storeId, billboardId } = await params;
 
     if (!storeId)
       return new NextResponse("Store ID is required", { status: 400 });

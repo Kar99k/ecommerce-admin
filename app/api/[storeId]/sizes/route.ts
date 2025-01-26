@@ -5,13 +5,13 @@ import { NextResponse } from "next/server";
 // POST /api/[storeId]/sizes
 export async function POST(
   req: Request,
-  { params }: { params: { storeId: string } }
+  props: { params: Promise<{ storeId: string }> }
 ) {
   try {
     const { userId } = await auth();
     const body = await req.json();
     const { name, value } = body;
-    const { storeId } = await params;
+    const { storeId } = await props.params;
 
     if (!userId) {
       return new NextResponse("Unauthenticated", { status: 401 });
@@ -55,10 +55,10 @@ export async function POST(
 // GET /api/[storeId]/sizes
 export async function GET(
   req: Request,
-  { params }: { params: { storeId: string } }
+  props: { params: Promise<{ storeId: string }> }
 ) {
   try {
-    const { storeId } = await params;
+    const { storeId } = await props.params;
 
     if (!storeId) {
       return new NextResponse("StoreId is required", { status: 400 });

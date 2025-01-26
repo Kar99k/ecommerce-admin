@@ -4,7 +4,7 @@ import { ColorForm } from "./components/color-form";
 const ColorPage = async ({
   params,
 }: {
-  params: { colorId: string; storeId: string };
+  params: Promise<{ colorId: string; storeId: string }>;
 }) => {
   const { colorId } = await params;
 

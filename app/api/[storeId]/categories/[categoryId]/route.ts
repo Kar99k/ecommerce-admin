@@ -5,13 +5,13 @@ import { NextResponse } from "next/server";
 // PATCH /api/[storeId]/categories/[categoryId]
 export async function PATCH(
   req: Request,
-  { params }: { params: { storeId: string; categoryId: string } }
+  props: { params: Promise<{ storeId: string; categoryId: string }> }
 ) {
   try {
     const { userId } = await auth();
     const body = await req.json();
     const { name, billboardId } = body;
-    const { storeId, categoryId } = await params;
+    const { storeId, categoryId } = await props.params;
 
     if (!userId) {
       return new NextResponse("Unauthenticated", { status: 401 });
@@ -58,11 +58,11 @@ export async function PATCH(
 // DELETE /api/[storeId]/categories/[categoryId]
 export async function DELETE(
   req: Request,
-  { params }: { params: { storeId: string; categoryId: string } }
+  props: { params: Promise<{ storeId: string; categoryId: string }> }
 ) {
   try {
     const { userId } = await auth();
-    const { storeId, categoryId } = await params;
+    const { storeId, categoryId } = await props.params;
 
     if (!userId) {
       return new NextResponse("Unauthenticated", { status: 401 });
@@ -99,11 +99,10 @@ export async function DELETE(
 // GET /api/[storeId]/categories/[categoryId]
 export async function GET(
   req: Request,
-  { params }: { params: { storeId: string; categoryId: string } }
+  props: { params: Promise<{ storeId: string; categoryId: string }> }
 ) {
+  const { storeId, categoryId } = await props.params;
   try {
-    const { storeId, categoryId } = await params;
-
     if (!storeId) {
       return new NextResponse("StoreId is required", { status: 400 });
     }

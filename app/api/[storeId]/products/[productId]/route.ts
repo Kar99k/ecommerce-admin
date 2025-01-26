@@ -5,11 +5,11 @@ import { NextResponse } from "next/server";
 // PATCH /api/[storeId]/products/[productId]
 export async function PATCH(
   req: Request,
-  { params }: { params: { storeId: string; productId: string } }
+  props: { params: Promise<{ storeId: string; productId: string }> }
 ) {
   try {
     const { userId } = await auth();
-    const { storeId, productId } = await params;
+    const { storeId, productId } = await props.params;
     const body = await req.json();
     const {
       name,
@@ -93,11 +93,11 @@ export async function PATCH(
 // DELETE /api/[storeId]/products/[productId]
 export async function DELETE(
   req: Request,
-  { params }: { params: { storeId: string; productId: string } }
+  props: { params: Promise<{ storeId: string; productId: string }> }
 ) {
   try {
     const { userId } = await auth();
-    const { storeId, productId } = await params;
+    const { storeId, productId } = await props.params;
 
     if (!userId) return new NextResponse("Unauthenticated", { status: 403 });
     if (!storeId)
@@ -126,10 +126,10 @@ export async function DELETE(
 // GET /api/[storeId]/products/[productId]
 export async function GET(
   req: Request,
-  { params }: { params: { storeId: string; productId: string } }
+  props: { params: Promise<{ storeId: string; productId: string }> }
 ) {
   try {
-    const { storeId, productId } = await params;
+    const { storeId, productId } = await props.params;
 
     if (!storeId)
       return new NextResponse("Store ID is required", { status: 400 });
