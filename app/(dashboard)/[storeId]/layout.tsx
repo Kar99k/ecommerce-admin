@@ -30,9 +30,11 @@ export default async function DashboardLayout({
   }
 
   return (
-    <div>
+    <div className="flex flex-col min-h-screen w-full overflow-x-hidden">
       <Navbar />
-      {children}
+      <div className="flex-1 space-y-4 p-4 md:p-8 max-w-full">
+        {children}
+      </div>
     </div>
   );
 }
