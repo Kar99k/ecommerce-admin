@@ -1,8 +1,24 @@
-import { prismadb } from "@/lib/prismadb";
 import { OrderClient } from "./components/client";
 import { OrderColumn } from "./components/columns";
 import { format } from "date-fns";
 import { formatter } from "@/lib/utils";
+import { createAxiosInstance } from "@/lib/axiosInstance";
+
+type Order = {
+  id: string;
+  storeId: string;
+  isPaid: boolean;
+  phone: string;
+  address: string;
+  createdAt: Date;
+  orderItems: {
+    product: {
+      id: string;
+      name: string;
+      price: string;
+    };
+  }[];
+};
 
 const OrdersPage = async ({
   params,
@@ -10,20 +26,14 @@ const OrdersPage = async ({
   params: Promise<{ storeId: string }>;
 }) => {
   const { storeId } = await params;
-  const orders = await prismadb.order.findMany({
-    where: {
-      storeId: storeId,
-    },
-    include: {
-      orderItems: {
-        include: {
-          product: true,
-        },
-      },
-    },
-  });
 
-  const formattedOrders: OrderColumn[] = orders.map((item) => ({
+  const axiosInstance = await createAxiosInstance();
+
+  const { data: orders } = await axiosInstance.get(
+    `${process.env.NEXT_PUBLIC_APP_URL}/api/${storeId}/orders`
+  );
+
+  const formattedOrders: OrderColumn[] = orders.map((item:Order) => ({
     id: item.id,
     phone: item.phone,
     address: item.address,
