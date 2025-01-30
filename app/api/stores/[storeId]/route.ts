@@ -51,3 +51,30 @@ export async function DELETE(
     return new NextResponse("[STORE_DELETE_ERROR]", { status: 500 });
   }
 }
+
+export async function GET(
+  req: Request,
+  props: { params: Promise<{ storeId: string }> }
+) {
+  try {
+    const { storeId } = await props.params;
+    const { userId } = await auth();
+
+    if (!storeId) {
+      return new NextResponse("Store ID is required", { status: 400 });
+    }
+
+    if (!userId) {
+      return new NextResponse("Unauthorized", { status: 401 });
+    }
+
+    const store = await prismadb.store.findUnique({
+      where: { id: storeId, userId },
+    });
+
+    return NextResponse.json(store);
+  } catch (error) {
+    console.log("[STORE_GET_ERROR]:", error);
+    return new NextResponse("[STORE_GET_ERROR]", { status: 500 });
+  }
+}
