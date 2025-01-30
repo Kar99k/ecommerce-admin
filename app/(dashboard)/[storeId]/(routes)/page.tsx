@@ -1,5 +1,3 @@
-import { prismadb } from "@/lib/prismadb";
-
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -12,6 +10,7 @@ import { CalendarDateRangePicker } from "./components/date-range-picker";
 import { Overview } from "./components/overview";
 import { RecentSales } from "./components/recent-sales";
 import { ArrowDownIcon, ArrowUpIcon } from "lucide-react";
+import { createAxiosInstance } from "@/lib/axiosInstance";
 
 interface DashboardPageProps {
   params: Promise<{ storeId: string }>;
@@ -20,11 +19,11 @@ interface DashboardPageProps {
 const DashboardPage: React.FC<DashboardPageProps> = async ({ params }) => {
   const { storeId } = await params;
 
-  const store = await prismadb.store.findFirst({
-    where: {
-      id: storeId,
-    },
-  });
+  const axiosInstance = await createAxiosInstance();
+
+  const { data: store } = await axiosInstance.get(
+    `${process.env.NEXT_PUBLIC_APP_URL}/api/stores/${storeId}`
+  );
 
   return (
     <>

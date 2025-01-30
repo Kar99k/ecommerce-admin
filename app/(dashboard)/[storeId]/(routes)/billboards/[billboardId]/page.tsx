@@ -1,18 +1,17 @@
-import { prismadb } from "@/lib/prismadb";
 import { BillboardForm } from "./components/billboard-form";
+import { createAxiosInstance } from "@/lib/axiosInstance";
 
 const BillboardPage = async ({
   params,
 }: {
-  params: Promise<{ billboardId: string }>;
+  params: Promise<{ billboardId: string; storeId: string }>;
 }) => {
-  const { billboardId } = await params;
+  const { billboardId, storeId } = await params;
+  const axiosInstance = await createAxiosInstance();
 
-  const billboard = await prismadb.billboard.findUnique({
-    where: {
-      id: billboardId,
-    },
-  });
+  const { data: billboard } = await axiosInstance.get(
+    `${process.env.NEXT_PUBLIC_APP_URL}/api/${storeId}/billboards/${billboardId}`
+  );
 
   return (
     <div className="flex-col">
