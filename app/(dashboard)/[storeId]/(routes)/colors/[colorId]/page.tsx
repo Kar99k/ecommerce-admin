@@ -1,18 +1,18 @@
-import { prismadb } from "@/lib/prismadb";
 import { ColorForm } from "./components/color-form";
+import { createAxiosInstance } from "@/lib/axiosInstance";
 
 const ColorPage = async ({
   params,
 }: {
   params: Promise<{ colorId: string; storeId: string }>;
 }) => {
-  const { colorId } = await params;
+  const { colorId, storeId } = await params;
 
-  const color = await prismadb.color.findUnique({
-    where: {
-      id: colorId,
-    },
-  });
+  const axiosInstance = await createAxiosInstance();
+
+  const { data: color } = await axiosInstance.get(
+    `${process.env.NEXT_PUBLIC_APP_URL}/api/${storeId}/colors/${colorId}`
+  );
 
   return (
     <div className="flex-col">

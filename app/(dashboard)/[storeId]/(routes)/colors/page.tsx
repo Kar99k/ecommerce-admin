@@ -1,8 +1,8 @@
-// convert to colors page
-import { prismadb } from "@/lib/prismadb";
 import { ColorsClient } from "./components/client";
 import { ColorColumn } from "./components/columns";
 import { format } from "date-fns";
+import { createAxiosInstance } from "@/lib/axiosInstance";
+import { Color } from "@prisma/client";
 
 const ColorsPage = async ({
   params,
@@ -10,13 +10,13 @@ const ColorsPage = async ({
   params: Promise<{ storeId: string }>;
 }) => {
   const { storeId } = await params;
-  const colors = await prismadb.color.findMany({
-    where: {
-      storeId: storeId,
-    },
-  });
+  const axiosInstance = await createAxiosInstance();
 
-  const formattedColors: ColorColumn[] = colors.map((item) => ({
+  const { data: colors } = await axiosInstance.get(
+    `${process.env.NEXT_PUBLIC_APP_URL}/api/${storeId}/colors`
+  );
+
+  const formattedColors: ColorColumn[] = colors.map((item: Color) => ({
     id: item.id,
     name: item.name,
     value: item.value,
