@@ -1,8 +1,12 @@
-// convert this to a category page
-import { prismadb } from "@/lib/prismadb";
 import { CategoryColumn } from "./components/columns";
 import { format } from "date-fns";
 import { CategoryClient } from "./components/client";
+import { createAxiosInstance } from "@/lib/axiosInstance";
+import { Billboard, Category } from "@prisma/client";
+
+interface CategoryWithBillboard extends Category {
+  billboard: Billboard;
+}
 
 const CategoriesPage = async ({
   params,
@@ -10,24 +14,20 @@ const CategoriesPage = async ({
   params: Promise<{ storeId: string }>;
 }) => {
   const { storeId } = await params;
-  const categories = await prismadb.category.findMany({
-    where: {
-      storeId: storeId,
-    },
-    include: {
-      billboard: true,
-    },
-    orderBy: {
-      createdAt: "desc",
-    },
-  });
+  const axiosInstance = await createAxiosInstance();
 
-  const formattedCategories: CategoryColumn[] = categories.map((item) => ({
-    id: item.id,
-    name: item.name,
-    billboardLabel: item.billboard.label,
-    createdAt: format(item.createdAt, "MMMM do, yyyy"),
-  }));
+  const { data: categories } = await axiosInstance.get(
+    `${process.env.NEXT_PUBLIC_APP_URL}/api/${storeId}/categories`
+  );
+  
+  const formattedCategories: CategoryColumn[] = categories.map(
+    (item: CategoryWithBillboard) => ({
+      id: item.id,
+      name: item.name,
+      billboardLabel: item.billboard.label,
+      createdAt: format(item.createdAt, "MMMM do, yyyy"),
+    })
+  );
 
   return (
     <div className="flex-col">

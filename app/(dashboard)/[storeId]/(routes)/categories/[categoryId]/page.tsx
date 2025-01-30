@@ -1,6 +1,5 @@
-// convert this to a category page
-import { prismadb } from "@/lib/prismadb";
 import { CategoryForm } from "./components/category-form";
+import { createAxiosInstance } from "@/lib/axiosInstance";
 
 const CategoryPage = async ({
   params,
@@ -9,17 +8,15 @@ const CategoryPage = async ({
 }) => {
   const { categoryId, storeId } = await params;
 
-  const category = await prismadb.category.findUnique({
-    where: {
-      id: categoryId,
-    },
-  });
+  const axiosInstance = await createAxiosInstance();
 
-  const billboards = await prismadb.billboard.findMany({
-    where: {
-      storeId: storeId,
-    },
-  });
+  const { data: category } = await axiosInstance.get(
+    `${process.env.NEXT_PUBLIC_APP_URL}/api/${storeId}/categories/${categoryId}`
+  );
+
+  const { data: billboards } = await axiosInstance.get(
+    `${process.env.NEXT_PUBLIC_APP_URL}/api/${storeId}/billboards`
+  );
 
   return (
     <div className="flex-col">
