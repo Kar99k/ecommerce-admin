@@ -1,5 +1,5 @@
-import { prismadb } from "@/lib/prismadb";
 import { ProductForm } from "./components/product-form";
+import { createAxiosInstance } from "@/lib/axiosInstance";
 
 const ProductPage = async ({
   params,
@@ -7,15 +7,23 @@ const ProductPage = async ({
   params: Promise<{ productId: string; storeId: string }>;
 }) => {
   const { productId, storeId } = await params;
+  const axiosInstance = await createAxiosInstance();
 
-  const product = await prismadb.product.findUnique({
-    where: {
-      id: productId,
-    },
-    include: {
-      images: true,
-    },
-  });
+  const { data: product } = await axiosInstance.get(
+    `${process.env.NEXT_PUBLIC_APP_URL}/api/${storeId}/products/${productId}`
+  );
+
+  const { data: categories } = await axiosInstance.get(
+    `${process.env.NEXT_PUBLIC_APP_URL}/api/${storeId}/categories`
+  );
+
+  const { data: sizes } = await axiosInstance.get(
+    `${process.env.NEXT_PUBLIC_APP_URL}/api/${storeId}/sizes`
+  );
+
+  const { data: colors } = await axiosInstance.get(
+    `${process.env.NEXT_PUBLIC_APP_URL}/api/${storeId}/colors`
+  );
 
   const serializedProduct = product
     ? {
@@ -23,24 +31,6 @@ const ProductPage = async ({
         price: parseFloat(product.price.toString()), // Convert Decimal to number
       }
     : null;
-
-  const categories = await prismadb.category.findMany({
-    where: {
-      storeId,
-    },
-  });
-
-  const colors = await prismadb.color.findMany({
-    where: {
-      storeId,
-    },
-  });
-
-  const sizes = await prismadb.size.findMany({
-    where: {
-      storeId,
-    },
-  });
 
   return (
     <div className="flex-col">
